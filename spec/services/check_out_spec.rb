@@ -1,4 +1,3 @@
-# require './app/services/checkout'
 require 'rails_helper'
 
 describe CheckOut do

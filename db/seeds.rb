@@ -17,6 +17,7 @@ Product.create([
 	{code: '002', name: 'Personalised cufflinks', price: 45.00},
 	{code: '003', name: 'Kids T-shirt', price: 19.95}
 ])
+puts '..Imported Product sample'
 
 Promotion.create([
 	{ name: 'buy_2_get_discount',
@@ -34,3 +35,5 @@ Promotion.create([
 						code: {value: '002', operator: 'e'}}, 
 		action: {price: 40}}
 ])
+
+puts '..Imported Promotion sample'

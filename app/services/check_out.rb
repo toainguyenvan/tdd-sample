@@ -2,7 +2,10 @@ class CheckOut
 	attr_accessor :promotion_rules, :total
 	attr_accessor :basket
 
-	def initialize(promotion)
+	def initialize(promotion = nil)
+		unless promotion
+			promotion = Promotion.all
+		end
 		@promotion_rules = promotion
 		@basket = Hash.new()
 		@basket['all'] = {total: 0, discount_percent:0, quantity: 0 }
@@ -84,5 +87,6 @@ class CheckOut
 		end
 
 		@total = (@basket['all'][:total] * (100 - @basket['all'][:discount_percent])/100).to_f.round(2)
+		puts 'Total price: ' "#{@total}"
 	end
 end
