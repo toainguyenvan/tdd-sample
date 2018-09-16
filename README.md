@@ -32,10 +32,6 @@ spec/
 | 002 | Personalised cufflinks| 45.00|
 | 003 | Kids T-shirt |19.95|
 | ... | ...|...|
-| header 1 | header 2 |
-| -------- | -------- |
-| cell 1   | cell 2   |
-| cell 3   | cell 4   |
 
 ```ruby
 class Product < ApplicationRecord
