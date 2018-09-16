@@ -25,12 +25,14 @@ spec/
 # Models
 
 ### Product
-   | Code | Name | Price
+
+    | Code | Name | Price
     | ------ | ------ |---
     | 001 | Lavender heart| 9.25
     | 002 | Personalised cufflinks| 45.00
     | 003 | Kids T-shirt |19.95
     | ... | ...|...
+	
 ```ruby
 class Product < ApplicationRecord
     validates_presence_of :code, :name, :price
