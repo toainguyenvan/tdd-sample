@@ -12,8 +12,8 @@
 #
 
 class Promotion < ApplicationRecord
-	serialize :condition, Hash
-	serialize :action, Hash
+  serialize :condition, Hash
+  serialize :action, Hash
 
-	validates_presence_of :name, :condition, :action
+  validates_presence_of :name, :condition, :action
 end

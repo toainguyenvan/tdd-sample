@@ -1,92 +1,101 @@
 class CheckOut
-	attr_accessor :promotion_rules, :total
-	attr_accessor :basket
+  attr_accessor :promotions_rule, :basket
 
-	def initialize(promotion = nil)
-		unless promotion
-			promotion = Promotion.all
-		end
-		@promotion_rules = promotion
-		@basket = Hash.new()
-		@basket['all'] = {total: 0, discount_percent:0, quantity: 0 }
-		@total = 0
-	end
+  def initialize(promotion = nil)
+    @promotions_rule = promotion || Promotion.all
+    @basket = {
+      all: { 
+        total: 0,
+        discount_percent: 0,
+        quantity: 0 
+      }
+    }
+  end
 
-	def scan(code)
-		item = Product.find_by(code: code)
-		return calculate if !item
+  def scan(code)
+    item = Product.find_by(code: code)
+    return calculate if item.nil?
+    put_item_into_basket(item)
+    check_promotions_rule(item)
+    calculate
+  end
 
-		if !@basket[code]
-			@basket[code] = {quantity: 1, sub_total: item.price, code: code, price: item.price, discount_percent: 0}
-		else
-			@basket[code][:sub_total] += item.price
-			@basket[code][:quantity] += 1
-			@basket[code][:code] = code
-			@basket[code][:price] = item.price
-			@basket[code][:discount_percent] = 0
-		end
+  def total
+    basket[:all][:total]
+  end
 
-		@basket['all'][:total] += item.price
+  private
+  def default_basket_item
+    {
+      quantity: 0,
+      sub_total: 0,
+      code: nil,
+      price: 0,
+      discount_percent: 0
+    }
+  end
 
-		@promotion_rules.each do |promotion|
-			data = promotion.type == 'PromotionType::Single' ? @basket[item.code] : @basket['all']
-			has_promotion = checkPromotion(data, promotion.condition)
-			if has_promotion == true
-				applyPromotion(data, promotion.action)
-			end
-		end
-		
-		calculate
-	end
+  def put_item_into_basket(item)
+    basket[item.code] ||= default_basket_item
+    basket[item.code][:code] = item.code
+    basket[item.code][:quantity] += 1
+    basket[item.code][:price] = item.price
+    basket[item.code][:sub_total] = basket[item.code][:quantity] * item.price
+    basket[:all][:total] += item.price
+  end
 
-	def checkOperator(item, value)
-		checkWithOperator(item, value)
-	end
+  def check_conditions_valid?(basket_item, promotion)
+    return false if promotion.condition.length == 0 || basket_item.nil?
+    promotion.condition.all? { |key, value|
+      check_with_operator(basket_item[key], value)
+    }
+  end
 
-	private
-	def checkPromotion(data, condition)
-		if condition.length > 0
-			condition.each do |key, value|
-				return false if data and !checkWithOperator(data[key], value)
-			end
-			return true
-		end
-		return false
-	end
+  def check_promotions_rule(item)
+    promotions_rule.each do |promotion|
+      basket_item = promotion.type == 'PromotionType::Single' ? basket[item.code] : basket[:all]
+      if check_conditions_valid?(basket_item, promotion)
+        apply_promotion(basket_item, promotion.action)
+      end
+    end
+  end
 
-	def checkWithOperator(item, value)
-		condition = false
-		case value[:operator]
-		when 'gt'
-			condition = item > value[:value]
-		when 'gte'
-			condition = item >= value[:value]
-		when 'lt'
-			condition = item < value[:value]
-		when 'lte'
-			condition = item <= value[:value]
-		else
-			condition = item == value[:value]
-		end
-		return condition
-	end
+  def check_with_operator(item, value)
+    condition = false
+    case value[:operator]
+    when 'gt'
+      condition = item > value[:value]
+    when 'gte'
+      condition = item >= value[:value]
+    when 'lt'
+      condition = item < value[:value]
+    when 'lte'
+      condition = item <= value[:value]
+    else
+      condition = item == value[:value]
+    end
+    return condition
+  end
 
-	def applyPromotion(item, action)
-		action.each do |key, value|
-			item[key] = value
-		end
-	end
+  def apply_promotion(basket_item, action)
+    action.each { |attribute, value| basket_item[attribute] = value }
+  end
 
-	def calculate
-		@total = 0
-		@basket.each do |key, value|
-			next if key == 'all'
-			total_per_item = (value[:quantity] * value[:price] * (100 - value[:discount_percent])/100).to_f.round(2)
-			@total += total_per_item
-			@basket['all'][:total] = @total
-		end
+  def basket_total_per_item(item)
+     (item[:quantity] * item[:price] * (100 - item[:discount_percent])/100).to_f.round(2)
+  end
 
-		@total = (@basket['all'][:total] * (100 - @basket['all'][:discount_percent])/100).to_f.round(2)
-		puts 'Total price: ' "#{@total}"
-	end
+  def calculate_actual_basket
+    basket[:all][:total] = (basket[:all][:total] * (100 - basket[:all][:discount_percent])/100).to_f.round(2)
+  end
+
+  def calculate
+    basket[:all][:total] = 0
+    basket.each { |key, item| 
+      next if key == :all
+      basket[:all][:total] += basket_total_per_item(item) 
+    } 
+    calculate_actual_basket
+    puts 'Total price: ' "#{total}"
+  end
 end

@@ -11,5 +11,5 @@
 #
 
 class Product < ApplicationRecord
-	validates_presence_of :code, :name, :price
+  validates_presence_of :code, :name, :price
 end
