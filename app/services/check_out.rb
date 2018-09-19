@@ -45,8 +45,8 @@ class CheckOut
   end
 
   def check_conditions_valid?(basket_item, promotion)
-    return false if promotion.condition.length == 0 || basket_item.nil?
-    promotion.condition.all? { |key, value|
+    return false if promotion.conditions.length == 0 || basket_item.nil?
+    promotion.conditions.all? { |key, value|
       check_with_operator(basket_item[key], value)
     }
   end
@@ -55,7 +55,7 @@ class CheckOut
     promotions_rule.each do |promotion|
       basket_item = promotion.type == 'PromotionType::Single' ? basket[item.code] : basket[:all]
       if check_conditions_valid?(basket_item, promotion)
-        apply_promotion(basket_item, promotion.action)
+        apply_promotion(basket_item, promotion.actions)
       end
     end
   end
@@ -77,8 +77,8 @@ class CheckOut
     return condition
   end
 
-  def apply_promotion(basket_item, action)
-    action.each { |attribute, value| basket_item[attribute] = value }
+  def apply_promotion(basket_item, actions)
+    actions.each { |attribute, value| basket_item[attribute] = value }
   end
 
   def basket_total_per_item(item)

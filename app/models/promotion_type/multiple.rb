@@ -4,8 +4,8 @@
 #
 #  id         :integer          not null, primary key
 #  name       :string
-#  condition  :string
-#  action     :string
+#  conditions :string
+#  actions    :string
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  type       :string

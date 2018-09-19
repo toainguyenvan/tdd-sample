@@ -4,16 +4,16 @@
 #
 #  id         :integer          not null, primary key
 #  name       :string
-#  condition  :string
-#  action     :string
+#  conditions :string
+#  actions    :string
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  type       :string
 #
 
 class Promotion < ApplicationRecord
-  serialize :condition, Hash
-  serialize :action, Hash
+  serialize :conditions, Hash
+  serialize :actions, Hash
 
-  validates_presence_of :name, :condition, :action
+  validates_presence_of :name, :conditions, :actions
 end

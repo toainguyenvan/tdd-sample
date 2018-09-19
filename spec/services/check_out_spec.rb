@@ -10,18 +10,18 @@ describe CheckOut do
   promotion = Promotion.create([
     { name: 'buy_2_get_discount',
       type: 'PromotionType::Single', 
-      condition: { quantity: {value: 2, operator: 'gte'}, 
+      conditions: { quantity: {value: 2, operator: 'gte'}, 
            code: {value: '001', operator: 'e'}}, 
-      action: {price: 8.5}},
+      actions: {price: 8.5}},
     { name: 'buy_more_than_60_get_10_percent_discount', 
       type: 'PromotionType::Multiple',
-      condition: { total: { value:60 , operator: 'gte'}}, 
-      action: { discount_percent: 10 }},
+      conditions: { total: { value:60 , operator: 'gte'}}, 
+      actions: { discount_percent: 10 }},
     { name: 'buy_3_product_002_get_discount',
       type: 'PromotionType::Single', 
-      condition: { quantity: {value: 3, operator: 'gte'}, 
+      conditions: { quantity: {value: 3, operator: 'gte'}, 
              code: {value: '002', operator: 'e'}}, 
-      action: {price: 40}}
+      actions: {price: 40}}
   ])
 
   subject {described_class.new(promotion)}
